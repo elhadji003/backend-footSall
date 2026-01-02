@@ -94,13 +94,16 @@ TEMPLATES = [
 # =====================
 # DATABASE
 # =====================
+# Remplacer votre bloc DATABASE par celui-ci
 DATABASES = {
     "default": dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=True,
     )
 }
+
+if not DEBUG:
+    DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 
 # =====================
