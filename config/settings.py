@@ -15,9 +15,6 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # SECURITY
 # =====================
 SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY is not set")
-
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 # DEBUG = True
 ALLOWED_HOSTS = [
