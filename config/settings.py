@@ -2,14 +2,13 @@ import os
 from pathlib import Path
 import dj_database_url
 from datetime import timedelta
-import dotenv
-
+from dotenv import load_dotenv
 
 # =====================
 # BASE
 # =====================
 BASE_DIR = Path(__file__).resolve().parent.parent
-dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # =====================
