@@ -1,27 +1,31 @@
-from pathlib import Path
 import os
-from datetime import timedelta
+from pathlib import Path
 import dj_database_url
+from datetime import timedelta
+import dotenv
+
 
 # =====================
 # BASE
 # =====================
 BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # =====================
 # SECURITY
 # =====================
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
-
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    ".onrender.com"
-).split(",")
+# DEBUG = True
+ALLOWED_HOSTS = [
+    "localhost", 
+    "127.0.0.1", 
+    "192.168.1.8",
+]
 
 
 # =====================
@@ -161,9 +165,8 @@ CORS_ALLOW_CREDENTIALS = True
 # =====================
 # STATIC & MEDIA
 # =====================
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"
 )
