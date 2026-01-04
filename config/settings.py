@@ -15,8 +15,8 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # SECURITY
 # =====================
 SECRET_KEY = os.getenv('SECRET_KEY')
-# DEBUG = os.environ.get("DEBUG", "False") == "True"
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+# DEBUG = True
 ALLOWED_HOSTS = [
     "localhost", 
     "127.0.0.1", 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'users',
+    'reservations'
 ]
 
 
