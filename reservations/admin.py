@@ -22,6 +22,7 @@ class CreneauAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "salle",
+        "nombre_joueur",
         "date",
         "heure_debut",
         "heure_fin",

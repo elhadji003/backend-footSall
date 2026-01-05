@@ -9,9 +9,9 @@ class Creneau(models.Model):
     )
 
     date = models.DateField()
+    nombre_joueur = models.PositiveIntegerField(default=10)
     heure_debut = models.TimeField()
     heure_fin = models.TimeField()
-
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

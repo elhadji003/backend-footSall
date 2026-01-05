@@ -11,9 +11,14 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('role', 'super-admin')
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+    
+    @property
+    def is_staff(self):
+        # L'accès au dashboard Django dépend du rôle
+        return self.role in [self.UserRole.ADMIN, self.UserRole.SUPER_ADMIN]
 
     # 🔑 Obligatoire pour JWT / Django auth
     def get_by_natural_key(self, email):

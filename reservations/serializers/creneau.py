@@ -7,6 +7,7 @@ class CreneauSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "salle",
+            "nombre_joueur",
             "date",
             "heure_debut",
             "heure_fin",
