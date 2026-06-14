@@ -1,8 +1,9 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .view.auth_register import RegisterUserView, LoginUserView, LogoutView
-from .views import GetProfileUserView, GetProfileUserByIdView, UpdateProfileUserView, DeleteAccountWithPwd
+from .views import GetUsersView, GetProfileUserView, GetProfileUserByIdView, UpdateProfileUserView, DeleteAccountWithPwd
 from .view.view_change_pwd import PasswordChangeView
+from .view.user import DeleteUserView
 from .view.view_password import RequestPasswordResetView, PasswordResetConfirmView
 
 urlpatterns = [
@@ -16,6 +17,9 @@ urlpatterns = [
     path('profile/<int:user_id>/', GetProfileUserByIdView.as_view(), name="profile_user_by_id"),
     path('update/profile/', UpdateProfileUserView.as_view(), name="update_profile_user"),
     path('delete/account/', DeleteAccountWithPwd.as_view(), name="delete_account_user"),
+    path('list/', GetUsersView.as_view(), name="users_list"),
+    path('delete/<int:pk>/', DeleteUserView.as_view(), name="delete_user"),
+    #-------
 
     # Password Management
     path('change-password/user/', PasswordChangeView.as_view(), name="change_password"),
