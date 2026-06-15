@@ -1,9 +1,12 @@
 from rest_framework import serializers
 from ..models import Notification, Reservation
-from .creneau import CreneauSerializer 
+from .creneau import CreneauSerializer
+from .salle import SalleSerializer
 
 class ReservationSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
+    # Correction de ready_only -> read_only et source (salles -> salle selon tes fields ?)
+    salle_details = SalleSerializer(source="salle", read_only=True)
     creneau_details = CreneauSerializer(source="creneau", read_only=True)
 
     class Meta:
@@ -13,45 +16,48 @@ class ReservationSerializer(serializers.ModelSerializer):
             "user",
             "salle",
             "creneau",
+            "salle_details",
             "creneau_details",
             "status",
             "created_at",
         ]
-        # On garde status en read_only pour les clients, 
-        # mais attention : si l'admin doit le changer via ce ViewSet, 
-        # il faudra le gérer dans le ViewSet ou enlever read_only ici.
 
     def validate(self, data):
-        # 1. Utiliser .get() pour éviter le KeyError si le champ est absent (ex: en PATCH)
         creneau = data.get("creneau")
 
-        # 2. On n'applique les règles de blocage QUE si un créneau est fourni
         if creneau:
             if not creneau.is_active:
                 raise serializers.ValidationError("Ce créneau n'est plus disponible.")
 
-            # Blocage double réservation
-            if Reservation.objects.filter(creneau=creneau).exists():
+            # Correction : On exclut la réservation actuelle si c'est une modification
+            query = Reservation.objects.filter(creneau=creneau)
+            if self.instance:
+                query = query.exclude(pk=self.instance.pk)
+                
+            if query.exists():
                 raise serializers.ValidationError("Ce créneau est déjà réservé.")
 
         return data
 
     def create(self, validated_data):
         request = self.context.get("request")
-        validated_data["user"] = request.user
+        if request and hasattr(request, "user"):
+            validated_data["user"] = request.user
 
         reservation = super().create(validated_data)
 
         # Désactiver le créneau
-        reservation.creneau.is_active = False
-        reservation.creneau.status = "Confirmée"
-        reservation.creneau.save()
+        if reservation.creneau:
+            reservation.creneau.is_active = False
+            reservation.creneau.status = "Confirmée"
+            reservation.creneau.save()
 
         # Notification admin
-        Notification.objects.create(
-            user=reservation.salle.admin,
-            message=f"Nouvelle réservation pour {reservation.salle.nom}"
-        )
+        if reservation.salle and hasattr(reservation.salle, "admin"):
+            Notification.objects.create(
+                user=reservation.salle.admin,
+                message=f"Nouvelle réservation pour {reservation.salle.nom}"
+            )
 
         return reservation  
     
@@ -60,8 +66,9 @@ class ReservationSerializer(serializers.ModelSerializer):
 
         # Si annulation → remettre le créneau disponible
         if new_status == "cancelled" and instance.status != "cancelled":
-            instance.creneau.is_active = True
-            instance.creneau.status = "Disponible"
-            instance.creneau.save()
+            if instance.creneau:
+                instance.creneau.is_active = True
+                instance.creneau.status = "Disponible"
+                instance.creneau.save()
 
         return super().update(instance, validated_data)
