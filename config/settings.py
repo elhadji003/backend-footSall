@@ -18,8 +18,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # DEBUG = os.environ.get("DEBUG", "False") == "True"
 DEBUG = True
 ALLOWED_HOSTS = [
-    "localhost", 
-    "127.0.0.1", 
+    "localhost",
+    "127.0.0.1",
     "192.168.1.8",
 ]
 
@@ -162,7 +162,7 @@ if FRONTEND_URL:
 else:
     CORS_ALLOWED_ORIGINS = []
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 

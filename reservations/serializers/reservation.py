@@ -20,7 +20,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         # On garde status en read_only pour les clients, 
         # mais attention : si l'admin doit le changer via ce ViewSet, 
         # il faudra le gérer dans le ViewSet ou enlever read_only ici.
-        read_only_fields = ["status"]
 
     def validate(self, data):
         # 1. Utiliser .get() pour éviter le KeyError si le champ est absent (ex: en PATCH)
@@ -45,6 +44,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
         # Désactiver le créneau
         reservation.creneau.is_active = False
+        reservation.creneau.status = "Confirmée"
         reservation.creneau.save()
 
         # Notification admin
@@ -54,3 +54,14 @@ class ReservationSerializer(serializers.ModelSerializer):
         )
 
         return reservation  
+    
+    def update(self, instance, validated_data):
+        new_status = validated_data.get("status", instance.status)
+
+        # Si annulation → remettre le créneau disponible
+        if new_status == "cancelled" and instance.status != "cancelled":
+            instance.creneau.is_active = True
+            instance.creneau.status = "Disponible"
+            instance.creneau.save()
+
+        return super().update(instance, validated_data)
