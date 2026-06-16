@@ -17,8 +17,8 @@ class Salle(models.Model):
     telephone = models.CharField(max_length=20)
 
     # localisation (pour map / trajectoire)
-    latitude = models.DecimalField(max_digits=22, decimal_places=16)
-    longitude = models.DecimalField(max_digits=22, decimal_places=16)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
     prix = models.DecimalField(max_digits=8, decimal_places=2)
 
